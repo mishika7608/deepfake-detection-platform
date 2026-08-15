@@ -61,7 +61,7 @@ export function AnalyzeExperience() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start">
+    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start">
       {/* Media stays prominent throughout */}
       <div className="lg:sticky lg:top-24">
         <MediaPreview
