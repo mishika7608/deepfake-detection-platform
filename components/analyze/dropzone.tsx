@@ -9,6 +9,7 @@ export interface UploadedMedia {
   url: string
   name: string
   kind: 'image' | 'video'
+  file: File
 }
 
 export function Dropzone({ onSelect }: { onSelect: (media: UploadedMedia) => void }) {
@@ -25,6 +26,7 @@ export function Dropzone({ onSelect }: { onSelect: (media: UploadedMedia) => voi
       url: URL.createObjectURL(file),
       name: file.name,
       kind: isVideo ? 'video' : 'image',
+      file,
     })
   }
 

@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:api": ".venv\\Scripts\\python.exe -m uvicorn backend.main:app --reload --port 8000",
+    "dev:all": "concurrently -k -n api,web -c cyan,magenta \"npm run dev:api\" \"npm run dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
@@ -27,6 +29,7 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^10.0.5",
     "postcss": "^8.5",
     "tailwindcss": "^4.3.3",
     "typescript": "5.7.3"

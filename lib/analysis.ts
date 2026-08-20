@@ -184,6 +184,30 @@ export function getMockAnalysis(): AnalysisResult {
   }
 }
 
+/** Calls the local SelfBlendedImages service and adapts its score for the UI. */
+export async function getDetectorAnalysis(file: File): Promise<AnalysisResult> {
+  const form = new FormData()
+  form.append('file', file)
+  const baseUrl = process.env.NEXT_PUBLIC_DETECTOR_API_URL ?? 'http://localhost:8000'
+  const response = await fetch(`${baseUrl}/analyze`, { method: 'POST', body: form })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.detail ?? 'The detector service is unavailable.')
+  const score = payload.authenticity as number
+  const fake = payload.fakeness as number
+  const flagged = fake >= 0.5
+  return {
+    score,
+    risk: fake >= 0.7 ? 'elevated' : fake >= 0.4 ? 'moderate' : 'low',
+    verdict: flagged ? 'Possible deepfake detected' : 'Likely authentic',
+    summary: `SelfBlendedImages analyzed the detected face${file.type.startsWith('video/') ? 's across sampled frames' : ''}. This score is a model estimate, not a definitive determination.`,
+    signals: [{
+      key: 'ai-generation', label: 'SelfBlendedImages detector', icon: Sparkles,
+      summary: SIGNAL_LIBRARY[0].summary, score, status: flagged ? 'flag' : 'clear',
+      findings: [`SBI fakeness score: ${(fake * 100).toFixed(1)}%.`, flagged ? 'The detector found manipulation-like facial artifacts.' : 'The detector found no strong facial manipulation artifacts.'],
+    }],
+  }
+}
+
 export const RISK_COPY: Record<
   RiskLevel,
   { label: string; note: string }

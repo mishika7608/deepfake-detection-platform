@@ -7,7 +7,7 @@ import { Dropzone, type UploadedMedia } from '@/components/analyze/dropzone'
 import { MediaPreview } from '@/components/analyze/media-preview'
 import { AnalysisJourney } from '@/components/analyze/analysis-journey'
 import { ResultsView } from '@/components/analyze/results-view'
-import { getMockAnalysis, type AnalysisResult } from '@/lib/analysis'
+import { getDetectorAnalysis, type AnalysisResult } from '@/lib/analysis'
 import { Button } from '@/components/ui/button'
 
 type Stage = 'upload' | 'analyzing' | 'results'
@@ -31,10 +31,16 @@ export function AnalyzeExperience() {
     setStage('upload')
   }, [media])
 
-  const handleComplete = useCallback(() => {
-    setResult(getMockAnalysis())
+  const handleComplete = useCallback(async () => {
+    if (!media) return
+    try { setResult(await getDetectorAnalysis(media.file)) }
+    catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Analysis could not be completed.')
+      setStage('upload')
+      return
+    }
     setStage('results')
-  }, [])
+  }, [media])
 
   // Upload stage, no media yet — a single, welcoming column.
   if (stage === 'upload' && !media) {
